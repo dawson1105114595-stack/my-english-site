@@ -35,8 +35,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # 核心修改：如果上面的命令跑完，文件必在这个位置
-          path: docs/.vitepress/dist
-
+          path: .vitepress/dist
   deploy:
     environment:
       name: github-pages

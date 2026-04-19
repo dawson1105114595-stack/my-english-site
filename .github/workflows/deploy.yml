@@ -1,48 +1,42 @@
-name: Deploy VitePress site to Pages
-
+name: Deploy site
 on:
   push:
     branches: [main]
-
 permissions:
   contents: read
   pages: write
   id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build with VitePress
-        # 强制用这个命令，确保它在当前环境下运行
-        run: npx vitepress build docs
+      - run: npm install
+      - run: npm run docs:build
+      
+      - name: 📦 暴力搬运
+        run: |
+          # 找到那个生成的 dist 文件夹
+          TARGET=$(find . -type d -name "dist" | grep -v "node_modules" | head -n 1)
+          # 强行搬到一个叫 out 的普通目录
+          mkdir -p ./out
+          cp -r $TARGET/* ./out/
+          # 打印一下，让我们亲眼看到 index.html
+          ls -F ./out
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 核心修改：如果上面的命令跑完，文件必在这个位置
-          path: .vitepress/dist
+          # 只传这个绝对存在的 out 文件夹
+          path: ./out
+
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v4

@@ -30,23 +30,21 @@ jobs:
       - name: Build with VitePress
         run: npm run docs:build
 
-      - name: Locate and fix artifact path
+      - name: Final Path Fix
+        # 这一步会自动寻找生成的 dist 目录并统一挪到根目录的 site_output 文件夹
         run: |
-          REAL_DIST=$(find ${{ github.workspace }} -type d -name "dist" -not -path "*/node_modules/*" | head -1)
-          if [ -z "$REAL_DIST" ]; then
-            echo "❌ No dist directory found"
-            exit 1
-          fi
-          echo "✅ Found dist at: $REAL_DIST"
-          mkdir -p ${{ github.workspace }}/docs/.vitepress/dist
-          cp -r $REAL_DIST/* ${{ github.workspace }}/docs/.vitepress/dist/
-          ls -la ${{ github.workspace }}/docs/.vitepress/dist/
+          SEARCH_PATH=$(find . -type d -name "dist" | grep -v "node_modules" | head -n 1)
+          echo "Target dist found at: $SEARCH_PATH"
+          mkdir -p ./site_output
+          cp -r $SEARCH_PATH/* ./site_output/
+          echo "Files in site_output:"
+          ls -F ./site_output
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ github.workspace }}/docs/.vitepress/dist
-          retention-days: 1
+          # 直接上传这个绝对存在的普通文件夹
+          path: ./site_output
 
   deploy:
     environment:

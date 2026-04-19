@@ -28,17 +28,16 @@ jobs:
         run: npm install
 
       - name: Build with VitePress
-        # 这里是关键：强制指定在 docs 目录下打包
+        # 强制使用 npx 直接运行，不依赖 package.json 里的 scripts
         run: npx vitepress build docs
 
-      - name: Debug Output
-        # 如果打包成功，这里会列出文件；如果失败，这里会报错，帮我们抓凶手
+      - name: Check where is the dist folder
+        # 这步是诊断：如果 build 成功了，这里会列出文件。如果这里报错，说明 build 没成功。
         run: ls -R docs/.vitepress/dist
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 确保路径完全匹配
           path: docs/.vitepress/dist
 
   deploy:

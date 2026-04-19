@@ -28,22 +28,25 @@ jobs:
         run: npm install
 
       - name: Build with VitePress
-        # 强制使用 npx 直接运行，不依赖 package.json 里的 scripts
-        run: npx vitepress build docs
+        run: npm run docs:build
 
-      - name: Check where is the dist folder
-        # 这步是诊断：如果 build 成功了，这里会列出文件。如果这里报错，说明 build 没成功。
-        run: ls -R docs/.vitepress/dist
-
-      - name: Build with VitePress
-        # 我们强制让它把房子盖在指定位置
-        run: npx vitepress build docs
+      - name: Locate and fix artifact path
+        run: |
+          REAL_DIST=$(find ${{ github.workspace }} -type d -name "dist" -not -path "*/node_modules/*" | head -1)
+          if [ -z "$REAL_DIST" ]; then
+            echo "❌ No dist directory found"
+            exit 1
+          fi
+          echo "✅ Found dist at: $REAL_DIST"
+          mkdir -p ${{ github.workspace }}/docs/.vitepress/dist
+          cp -r $REAL_DIST/* ${{ github.workspace }}/docs/.vitepress/dist/
+          ls -la ${{ github.workspace }}/docs/.vitepress/dist/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 这样路径就绝对不会错了
-          path: docs/.vitepress/dist
+          path: ${{ github.workspace }}/docs/.vitepress/dist
+          retention-days: 1
 
   deploy:
     environment:

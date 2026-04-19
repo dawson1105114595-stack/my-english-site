@@ -2,6 +2,7 @@ import { defineConfig } from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: '/my-english-site/',
   title: "English Learning Hub",
   description: "It is a English learning hub",
   themeConfig: {

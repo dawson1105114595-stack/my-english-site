@@ -3,45 +3,29 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   base: '/my-english-site/',
   title: "Dawson's Hub",
-  description: "English Learning Hub",
+  description: "Less is More.",
   
   themeConfig: {
     // 导航栏
     nav: [
-      { text: '首页', link: '/' },
-      { text: '自我介绍', link: '/intro' }
+      { text: ' Home', link: '/' },
+      { text: 'About', link: '/intro' }
     ],
 
-    // 侧边栏：按照内容类型分类
+    // 侧边栏：极简风格
     sidebar: [
       {
-        text: '📖 词汇积累',
-        collapsed: false,
+        text: 'Language',
         items: [
-          { text: '核心词汇', link: '/vocabulary/index' },
-          { text: '地道表达', link: '/vocabulary/phrases' }
+          { text: 'Vocabulary', link: '/vocabulary/index' },
+          { text: 'Grammar', link: '/grammar/index' }
         ]
       },
       {
-        text: '📐 语法专题',
-        collapsed: false,
+        text: 'Writing',
         items: [
-          { text: '时态详解', link: '/grammar/index' },
-          { text: '长难句分析', link: '/grammar/sentences' }
-        ]
-      },
-      {
-        text: '✉️ 写作应用',
-        collapsed: false,
-        items: [
-          { text: '应用文模板', link: '/writing/index' },
-          { text: '读后续写素材', link: '/continuation/index' }
-        ]
-      },
-      {
-        text: '👤 关于我',
-        items: [
-          { text: '开发者介绍', link: '/intro' }
+          { text: 'Applied Writing', link: '/writing/index' },
+          { text: 'Continuation', link: '/continuation/index' }
         ]
       }
     ],
@@ -51,15 +35,41 @@ export default defineConfig({
     ]
   },
 
-  // 浅蓝色主题自定义
+  // 🍎 苹果风深度定制 CSS
   head: [
     ['style', {}, `
       :root {
-        --vp-c-brand: #3b82f6;      /* 浅蓝色主色调 */
-        --vp-c-brand-light: #60a5fa;
-        --vp-c-brand-lighter: #93c5fd;
-        --vp-c-brand-dark: #2563eb;
-        --vp-c-brand-darker: #1d4ed8;
+        /* 苹果标志性的纯净色调 */
+        --vp-c-brand: #000000;           /* 主色调为纯黑 */
+        --vp-c-brand-light: #424245;
+        --vp-c-brand-lighter: #86868b;
+        --vp-home-hero-name-background: linear-gradient(135deg, #000000 0%, #434343 100%);
+        
+        /* 按钮样式：苹果标志性的蓝色 */
+        --vp-button-brand-bg: #0071e3;
+        --vp-button-brand-hover-bg: #0077ed;
+        --vp-button-brand-text: #ffffff;
+        
+        /* 字体：优先使用苹果系统字体 */
+        --vp-font-family-base: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      }
+
+      /* 磨砂玻璃效果的导航栏 */
+      .VPNav {
+        backdrop-filter: blur(20px) saturate(180%);
+        background-color: rgba(255, 255, 255, 0.7) !important;
+      }
+
+      /* 让卡片看起来更有质感 */
+      .VPFeature {
+        border: none !important;
+        background-color: #f5f5f7 !important; /* 苹果官网常用的浅灰背景 */
+        border-radius: 18px !important;
+        transition: transform 0.3s ease;
+      }
+
+      .VPFeature:hover {
+        transform: scale(1.02);
       }
     `]
   ]

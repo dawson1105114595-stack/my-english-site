@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  base: '/my-english-site/',
+  base: '/',
   title: "Dawson's Hub",
   description: "Less is More.",
   

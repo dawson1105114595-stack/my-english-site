@@ -17,21 +17,19 @@ jobs:
       - run: npm install
       - run: npm run docs:build
       
-      - name: 📦 暴力搬运
+      - name: 📦 整理部署产物
         run: |
-          # 找到那个生成的 dist 文件夹
-          TARGET=$(find . -type d -name "dist" | grep -v "node_modules" | head -n 1)
-          # 强行搬到一个叫 out 的普通目录
-          mkdir -p ./out
-          cp -r $TARGET/* ./out/
-          # 打印一下，让我们亲眼看到 index.html
-          ls -F ./out
-
+          # 找到 VitePress 默认生成的 dist 目录
+          DIST_PATH=$(find . -type d -name "dist" | grep -v "node_modules" | head -n 1)
+          # 创建一个干净的输出目录
+          mkdir -p ./public
+          # 将所有内容拷贝进去
+          cp -r $DIST_PATH/* ./public/
+          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 只传这个绝对存在的 out 文件夹
-          path: ./out
+          path: ./public
 
   deploy:
     needs: build

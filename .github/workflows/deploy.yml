@@ -1,40 +1,52 @@
-name: Deploy site
+name: Deploy VitePress site to GitHub Pages
+
 on:
   push:
-    branches: [main]
+    branches: [main]   # 如果你的默认分支是 master，改成 master
+  workflow_dispatch:   # 允许手动触发
+
+# 设置 GITHUB_TOKEN 的权限，允许部署到 GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
+
+# 只允许一个并发部署，避免多个构建同时运行
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
-      - run: npm run docs:build
-      
-      - name: 📦 整理部署产物
-        run: |
-          # 找到 VitePress 默认生成的 dist 目录
-          DIST_PATH=$(find . -type d -name "dist" | grep -v "node_modules" | head -n 1)
-          # 创建一个干净的输出目录
-          mkdir -p ./public
-          # 将所有内容拷贝进去
-          cp -r $DIST_PATH/* ./public/
-          
+          cache: npm   # 缓存依赖，加速构建
+
+      - name: Install dependencies
+        run: npm ci    # 比 npm install 更稳定，严格按 package-lock.json 安装
+
+      - name: Build VitePress site
+        run: npm run docs:build   # 这个脚本必须在 package.json 中定义
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public
+          path: docs/.vitepress/dist   # VitePress 默认输出目录
 
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
     environment:
       name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
     steps:
-      - uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
